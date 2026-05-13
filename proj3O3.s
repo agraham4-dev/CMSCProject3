@@ -179,4 +179,3 @@ main:
 	.size	main, .-main
 	.ident	"GCC: (GNU) 11.5.0 20240719 (Red Hat 11.5.0-5)"
 	.section	.note.GNU-stack,"",@progbits
-
