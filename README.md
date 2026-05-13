@@ -1,5 +1,5 @@
 # CMSCProject3
-The third project in CMSC 313, analyzing the various optimizations
+The third project in CMSC 313, analyzing the various optimizations on a hexdump code we wrote
 
 The first difference I noticed between the files is the sizes. O0 has 163 lines of code at 2.53 kB, O1 has 171 lines of code at 2.63 kB, and O3 has 181 lines of code at 2.82 kB. As optimizations get improved the size of the file increases.
 
