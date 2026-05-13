@@ -2,14 +2,20 @@
 	.text
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
-	.string	"r"
+	.string	"Insert filename:"
 .LC1:
-	.string	"binary.out"
+	.string	"%49s"
 .LC2:
-	.string	"%08x "
+	.string	"r"
 .LC3:
-	.string	"%02x "
+	.string	"Failed to open file."
 .LC4:
+	.string	"Failed to allocate data."
+.LC5:
+	.string	"%08x "
+.LC6:
+	.string	"%02x "
+.LC7:
 	.string	"|"
 	.section	.text.startup,"ax",@progbits
 	.p2align 4
@@ -21,8 +27,8 @@ main:
 	pushq	%r15
 	.cfi_def_cfa_offset 16
 	.cfi_offset 15, -16
-	movl	$.LC0, %esi
-	movl	$.LC1, %edi
+	movl	$.LC0, %edi
+	xorl	%eax, %eax
 	pushq	%r14
 	.cfi_def_cfa_offset 24
 	.cfi_offset 14, -24
@@ -38,12 +44,19 @@ main:
 	pushq	%rbx
 	.cfi_def_cfa_offset 56
 	.cfi_offset 3, -56
-	subq	$40, %rsp
-	.cfi_def_cfa_offset 96
+	subq	$104, %rsp
+	.cfi_def_cfa_offset 160
+	call	printf
+	leaq	32(%rsp), %rsi
+	movl	$.LC1, %edi
+	xorl	%eax, %eax
+	call	__isoc99_scanf
+	movl	$.LC2, %esi
+	leaq	32(%rsp), %rdi
 	call	fopen
 	movq	%rax, 8(%rsp)
 	testq	%rax, %rax
-	je	.L19
+	je	.L22
 	movq	%rax, %r14
 	movl	$2, %edx
 	xorl	%esi, %esi
@@ -61,16 +74,18 @@ main:
 	movl	$16, %edi
 	call	calloc
 	movq	%rax, %r14
-	testl	%ebx, %ebx
-	jle	.L3
+	testq	%rax, %rax
+	je	.L3
 	leaq	1(%rax), %rax
 	xorl	%r13d, %r13d
 	movq	%rax, 24(%rsp)
+	testl	%ebx, %ebx
+	jle	.L5
 	.p2align 4,,10
 	.p2align 3
-.L10:
+.L4:
 	movl	%r13d, %esi
-	movl	$.LC2, %edi
+	movl	$.LC5, %edi
 	xorl	%eax, %eax
 	call	printf
 	movq	8(%rsp), %rcx
@@ -80,52 +95,52 @@ main:
 	call	fread
 	movq	%rax, %r12
 	testl	%eax, %eax
-	jle	.L4
+	jle	.L6
 	leal	-1(%rax), %ebp
 	movq	%r14, %rbx
 	addq	24(%rsp), %rbp
 	movq	%r14, %r15
 	.p2align 4,,10
 	.p2align 3
-.L5:
+.L7:
 	movzbl	(%r15), %esi
-	movl	$.LC3, %edi
+	movl	$.LC6, %edi
 	xorl	%eax, %eax
 	addq	$1, %r15
 	call	printf
 	cmpq	%rbp, %r15
-	jne	.L5
+	jne	.L7
 	movl	$124, %edi
 	call	putchar
-	jmp	.L9
+	jmp	.L11
 	.p2align 4,,10
 	.p2align 3
-.L20:
+.L23:
 	movl	$46, %edi
 	addq	$1, %rbx
 	call	putchar
 	cmpq	%rbp, %rbx
-	je	.L11
-.L9:
+	je	.L12
+.L11:
 	movsbl	(%rbx), %edi
 	cmpb	$31, %dil
-	jle	.L20
+	jle	.L23
 	call	putchar
 	addq	$1, %rbx
 	cmpq	%rbp, %rbx
-	jne	.L9
-.L11:
-	movl	$.LC4, %edi
+	jne	.L11
+.L12:
+	movl	$.LC7, %edi
 	addl	%r12d, %r13d
 	call	puts
 	cmpl	%r13d, 20(%rsp)
-	jg	.L10
-.L3:
+	jg	.L4
+.L5:
 	movq	%r14, %rdi
 	call	free
 	movq	8(%rsp), %rdi
 	call	fclose
-	addq	$40, %rsp
+	addq	$104, %rsp
 	.cfi_remember_state
 	.cfi_def_cfa_offset 56
 	xorl	%eax, %eax
@@ -144,13 +159,20 @@ main:
 	ret
 	.p2align 4,,10
 	.p2align 3
-.L4:
+.L6:
 	.cfi_restore_state
 	movl	$124, %edi
 	call	putchar
-	jmp	.L11
-.L19:
-	orl	$-1, %edi
+	jmp	.L12
+.L22:
+	movl	$.LC3, %edi
+	call	puts
+	movl	$1, %edi
+	call	exit
+.L3:
+	movl	$.LC4, %edi
+	call	puts
+	movl	$1, %edi
 	call	exit
 	.cfi_endproc
 .LFE22:
