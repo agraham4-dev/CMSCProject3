@@ -2,14 +2,20 @@
 	.text
 	.section	.rodata.str1.1,"aMS",@progbits,1
 .LC0:
-	.string	"r"
+	.string	"Insert filename:"
 .LC1:
-	.string	"binary.out"
+	.string	"%49s"
 .LC2:
-	.string	"%08x "
+	.string	"r"
 .LC3:
-	.string	"%02x "
+	.string	"Failed to open file."
 .LC4:
+	.string	"Failed to allocate data."
+.LC5:
+	.string	"%08x "
+.LC6:
+	.string	"%02x "
+.LC7:
 	.string	"|"
 	.text
 	.globl	main
@@ -35,14 +41,21 @@ main:
 	pushq	%rbx
 	.cfi_def_cfa_offset 56
 	.cfi_offset 3, -56
-	subq	$40, %rsp
-	.cfi_def_cfa_offset 96
-	movl	$.LC0, %esi
+	subq	$104, %rsp
+	.cfi_def_cfa_offset 160
+	movl	$.LC0, %edi
+	movl	$0, %eax
+	call	printf
+	leaq	32(%rsp), %rsi
 	movl	$.LC1, %edi
+	movl	$0, %eax
+	call	__isoc99_scanf
+	movl	$.LC2, %esi
+	leaq	32(%rsp), %rdi
 	call	fopen
 	movq	%rax, 8(%rsp)
 	testq	%rax, %rax
-	je	.L18
+	je	.L21
 	movl	$2, %edx
 	movl	$0, %esi
 	movq	8(%rsp), %r14
@@ -60,73 +73,21 @@ main:
 	movl	$16, %edi
 	call	calloc
 	movq	%rax, %r15
-	testl	%ebx, %ebx
-	jle	.L3
+	testq	%rax, %rax
+	je	.L3
 	movl	$0, %r14d
 	leaq	1(%rax), %rax
 	movq	%rax, 24(%rsp)
-	jmp	.L10
-.L18:
-	movl	$-1, %edi
-	call	exit
-.L7:
-	movsbl	%dil, %edi
-	call	putchar
-.L8:
-	addq	$1, %rbx
-	cmpq	%r12, %rbx
-	je	.L11
-.L9:
-	movzbl	(%rbx), %edi
-	cmpb	$31, %dil
-	jg	.L7
-	movl	$46, %edi
-	call	putchar
-	jmp	.L8
-.L4:
-	movl	$124, %edi
-	call	putchar
-.L11:
-	movl	$.LC4, %edi
-	call	puts
-	addl	%r13d, %r14d
-	cmpl	%r14d, 20(%rsp)
-	jle	.L3
-.L10:
-	movl	%r14d, %esi
-	movl	$.LC2, %edi
-	movl	$0, %eax
-	call	printf
-	movq	8(%rsp), %rcx
-	movl	$16, %edx
-	movl	$1, %esi
-	movq	%r15, %rdi
-	call	fread
-	movq	%rax, %r13
-	testl	%eax, %eax
-	jle	.L4
-	movq	%r15, %rbx
-	leal	-1(%rax), %r12d
-	addq	24(%rsp), %r12
-	movq	%r15, %rbp
+	testl	%ebx, %ebx
+	jg	.L4
 .L5:
-	movzbl	0(%rbp), %esi
-	movl	$.LC3, %edi
-	movl	$0, %eax
-	call	printf
-	addq	$1, %rbp
-	cmpq	%r12, %rbp
-	jne	.L5
-	movl	$124, %edi
-	call	putchar
-	jmp	.L9
-.L3:
 	movq	%r15, %rdi
 	call	free
 	movq	8(%rsp), %rdi
 	call	fclose
 	movl	$0, %eax
-	addq	$40, %rsp
+	addq	$104, %rsp
+	.cfi_remember_state
 	.cfi_def_cfa_offset 56
 	popq	%rbx
 	.cfi_def_cfa_offset 48
@@ -141,8 +102,71 @@ main:
 	popq	%r15
 	.cfi_def_cfa_offset 8
 	ret
+.L21:
+	.cfi_restore_state
+	movl	$.LC3, %edi
+	call	puts
+	movl	$1, %edi
+	call	exit
+.L3:
+	movl	$.LC4, %edi
+	call	puts
+	movl	$1, %edi
+	call	exit
+.L9:
+	movsbl	%dil, %edi
+	call	putchar
+.L10:
+	addq	$1, %rbx
+	cmpq	%r12, %rbx
+	je	.L12
+.L11:
+	movzbl	(%rbx), %edi
+	cmpb	$31, %dil
+	jg	.L9
+	movl	$46, %edi
+	call	putchar
+	jmp	.L10
+.L6:
+	movl	$124, %edi
+	call	putchar
+.L12:
+	movl	$.LC7, %edi
+	call	puts
+	addl	%r13d, %r14d
+	cmpl	%r14d, 20(%rsp)
+	jle	.L5
+.L4:
+	movl	%r14d, %esi
+	movl	$.LC5, %edi
+	movl	$0, %eax
+	call	printf
+	movq	8(%rsp), %rcx
+	movl	$16, %edx
+	movl	$1, %esi
+	movq	%r15, %rdi
+	call	fread
+	movq	%rax, %r13
+	testl	%eax, %eax
+	jle	.L6
+	movq	%r15, %rbx
+	leal	-1(%rax), %r12d
+	addq	24(%rsp), %r12
+	movq	%r15, %rbp
+.L7:
+	movzbl	0(%rbp), %esi
+	movl	$.LC6, %edi
+	movl	$0, %eax
+	call	printf
+	addq	$1, %rbp
+	cmpq	%r12, %rbp
+	jne	.L7
+	movl	$124, %edi
+	call	putchar
+	jmp	.L11
 	.cfi_endproc
 .LFE22:
 	.size	main, .-main
 	.ident	"GCC: (GNU) 11.5.0 20240719 (Red Hat 11.5.0-5)"
 	.section	.note.GNU-stack,"",@progbits
+	
