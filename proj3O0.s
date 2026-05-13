@@ -2,14 +2,20 @@
 	.text
 	.section	.rodata
 .LC0:
-	.string	"r"
+	.string	"Insert filename:"
 .LC1:
-	.string	"binary.out"
+	.string	"%49s"
 .LC2:
-	.string	"%08x "
+	.string	"r"
 .LC3:
-	.string	"%02x "
+	.string	"Failed to open file."
 .LC4:
+	.string	"Failed to allocate data."
+.LC5:
+	.string	"%08x "
+.LC6:
+	.string	"%02x "
+.LC7:
 	.string	"|"
 	.text
 	.globl	main
@@ -22,14 +28,25 @@ main:
 	.cfi_offset 6, -16
 	movq	%rsp, %rbp
 	.cfi_def_cfa_register 6
-	subq	$48, %rsp
-	movl	$.LC0, %esi
+	subq	$112, %rsp
+	movl	$.LC0, %edi
+	movl	$0, %eax
+	call	printf
+	leaq	-112(%rbp), %rax
+	movq	%rax, %rsi
 	movl	$.LC1, %edi
+	movl	$0, %eax
+	call	__isoc99_scanf
+	leaq	-112(%rbp), %rax
+	movl	$.LC2, %esi
+	movq	%rax, %rdi
 	call	fopen
 	movq	%rax, -24(%rbp)
 	cmpq	$0, -24(%rbp)
 	jne	.L2
-	movl	$-1, %edi
+	movl	$.LC3, %edi
+	call	puts
+	movl	$1, %edi
 	call	exit
 .L2:
 	movq	-24(%rbp), %rax
@@ -50,12 +67,19 @@ main:
 	movl	$16, %edi
 	call	calloc
 	movq	%rax, -40(%rbp)
+	cmpq	$0, -40(%rbp)
+	jne	.L3
+	movl	$.LC4, %edi
+	call	puts
+	movl	$1, %edi
+	call	exit
+.L3:
 	movl	$0, -4(%rbp)
-	jmp	.L3
-.L10:
+	jmp	.L4
+.L11:
 	movl	-4(%rbp), %eax
 	movl	%eax, %esi
-	movl	$.LC2, %edi
+	movl	$.LC5, %edi
 	movl	$0, %eax
 	call	printf
 	movq	-24(%rbp), %rdx
@@ -67,8 +91,8 @@ main:
 	call	fread
 	movq	%rax, -48(%rbp)
 	movl	$0, -8(%rbp)
-	jmp	.L4
-.L5:
+	jmp	.L5
+.L6:
 	movl	-8(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-40(%rbp), %rax
@@ -76,30 +100,30 @@ main:
 	movzbl	(%rax), %eax
 	movzbl	%al, %eax
 	movl	%eax, %esi
-	movl	$.LC3, %edi
+	movl	$.LC6, %edi
 	movl	$0, %eax
 	call	printf
 	addl	$1, -8(%rbp)
-.L4:
+.L5:
 	movq	-48(%rbp), %rax
 	cmpl	%eax, -8(%rbp)
-	jl	.L5
+	jl	.L6
 	movl	$124, %edi
 	call	putchar
 	movl	$0, -12(%rbp)
-	jmp	.L6
-.L9:
+	jmp	.L7
+.L10:
 	movl	-12(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-40(%rbp), %rax
 	addq	%rdx, %rax
 	movzbl	(%rax), %eax
 	cmpb	$31, %al
-	jg	.L7
+	jg	.L8
 	movl	$46, %edi
 	call	putchar
-	jmp	.L8
-.L7:
+	jmp	.L9
+.L8:
 	movl	-12(%rbp), %eax
 	movslq	%eax, %rdx
 	movq	-40(%rbp), %rax
@@ -108,20 +132,20 @@ main:
 	movsbl	%al, %eax
 	movl	%eax, %edi
 	call	putchar
-.L8:
+.L9:
 	addl	$1, -12(%rbp)
-.L6:
+.L7:
 	movq	-48(%rbp), %rax
 	cmpl	%eax, -12(%rbp)
-	jl	.L9
-	movl	$.LC4, %edi
+	jl	.L10
+	movl	$.LC7, %edi
 	call	puts
 	movq	-48(%rbp), %rax
 	addl	%eax, -4(%rbp)
-.L3:
+.L4:
 	movl	-4(%rbp), %eax
 	cmpl	-28(%rbp), %eax
-	jl	.L10
+	jl	.L11
 	movq	-40(%rbp), %rax
 	movq	%rax, %rdi
 	call	free
