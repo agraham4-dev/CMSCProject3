@@ -2,15 +2,23 @@
 #include <stdlib.h>
 
 int main(){
+    char filename[50]; //save the user inputted filename
+    printf("Insert filename:");
+    scanf("%49s", &filename);
     FILE *bf; //stands for binary file
-    bf = fopen("binary.out", "r"); //opens with read
+    bf = fopen(filename, "r"); //opens with read
     if(bf==NULL){
-        exit(-1); //exit immediately as the file failed to open
+        printf("Failed to open file.\n");
+        exit(EXIT_FAILURE ); //exit immediately as the file failed to open
     }
     fseek(bf, 0L, SEEK_END); //Goes to the end of the file
     int len = ftell(bf); //Checks the length
     fseek(bf, 0L, SEEK_SET); //returns to start of the file
     char *cs = (char *)calloc(0x10, sizeof(char)); //save the message
+    if(cs==NULL){
+        printf("Failed to allocate data.\n");
+        exit(EXIT_FAILURE ); //exit immediately as the allocation failed
+    }
     int bp = 0; //bytes passed
     while(bp < len){
         printf("%08x ", bp); //prints the number of bytes passed
